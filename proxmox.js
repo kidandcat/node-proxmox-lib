@@ -1,5 +1,5 @@
 module.exports = (options) => {
-  
+
     let px = {};
 
     options.url = options.url || 'https://localhost:8006/api2/json/';
@@ -158,7 +158,14 @@ module.exports = (options) => {
                 console.log('ERROR:', err);
                 error(err);
             }
-            success(JSON.parse(body));
+
+
+            if (res.statusCode == 200) {
+                console.log('SUCCESS:', body);
+                success(JSON.parse(body));
+            } else {
+                throw new Error(`Auth failed! ${USER} - ${PASS}`, body);
+            }
         });
 
 
