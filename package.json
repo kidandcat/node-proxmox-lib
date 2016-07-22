@@ -1,6 +1,6 @@
 {
     "name": "proxmox-lib",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "Proxmox Simple Library",
     "main": "proxmox.js",
     "scripts": {
