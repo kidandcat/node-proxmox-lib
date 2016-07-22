@@ -1,14 +1,18 @@
 {
-  "name": "proxmox-lib",
-  "version": "1.0.2",
-  "description": "Proxmox Simple Library",
-  "main": "proxmox.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "Jairo Caro-Accino Viciana <jairo@galax.be>",
-  "license": "MIT",
-  "dependencies": {
-    "request": "^2.73.0"
-  }
+    "name": "proxmox-lib",
+    "version": "1.0.3",
+    "description": "Proxmox Simple Library",
+    "main": "proxmox.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "Jairo Caro-Accino Viciana <jairo@galax.be>",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/kidandcat/node-proxmox-lib.git"
+    },
+    "dependencies": {
+        "request": "^2.73.0"
+    }
 }
