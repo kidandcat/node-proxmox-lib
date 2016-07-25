@@ -40,6 +40,10 @@ npm install proxmox-lib
 
 - px.statusContainer(id, callback) -> Status of container
 
+- px.startContainer(id, callback) -> Start container
+
+- px.stopContainer(id, callback) -> Stop container
+
 - px.createContainer(options, callback) -> Create container
 
   - template: 'string',

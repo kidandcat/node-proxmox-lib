@@ -92,10 +92,37 @@ module.exports = (options) => {
         });
     }
 
+    px.startContainer = (id, cb) => {
+        let resp = {};
+        let c = NODE.length;
+        NODE.forEach(n => {
+            _get(`/nodes/${n}/lxc/${id}/status/start`, 'post').then(data => {
+              c--
+              resp[n] = data;
+              if(c == 0){
+                cb(resp);
+              }
+            });
+        });
+    }
+
+    px.stopContainer = (id, cb) => {
+        let resp = {};
+        let c = NODE.length;
+        NODE.forEach(n => {
+            _get(`/nodes/${n}/lxc/${id}/status/stop`, 'post').then(data => {
+              c--
+              resp[n] = data;
+              if(c == 0){
+                cb(resp);
+              }
+            });
+        });
+    }
 
     px.createContainer = (options, cb) => {
         px.nextId((response) => {
-            _get(`/nodes/${NODE}/lxc`, 'post', {
+            _get(`/nodes/${NODE[0]}/lxc`, 'post', {
                 ostemplate: options.template,
                 vmid: Number(response.data),
                 cpuunits: options.cpu,
