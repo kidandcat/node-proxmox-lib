@@ -5,7 +5,7 @@ module.exports = (options) => {
     options.url = options.url || 'https://localhost:8006/api2/json/';
     options.user = options.user || 'root';
     options.password = options.password || '';
-    options.node = options.node || 'pve';
+    options.node = options.node || ['pve'];
     options.templateStorage = options.templateStorage || 'local';
 
     if (options.url.slice(-1) == '/') {
@@ -16,7 +16,7 @@ module.exports = (options) => {
     const URL = options.url;
     const USER = options.user;
     const PASS = options.password;
-    const NODE = options.node;
+    let NODE = Array.from(options.node);
     const STORAGE = options.templateStorage;
     let TICKET = '';
     let CSRF = '';
@@ -37,26 +37,58 @@ module.exports = (options) => {
     }
 
     px.nodeStatus = (cb) => {
-        _get('/nodes/' + NODE + '/status', 'get').then(data => {
-            cb(data);
+        let resp = {};
+        let c = NODE.length;
+        NODE.forEach(n => {
+            _get(`/nodes/${n}/status`, 'get').then(data => {
+                c--
+                resp[n] = data;
+                if(c == 0){
+                  cb(resp);
+                }
+            });
         });
     }
 
     px.listTemplates = (cb) => {
-        _get(`/nodes/${NODE}/storage/${STORAGE}/content?content=vztmpl`, 'get').then(data => {
-            cb(data);
+        let resp = {};
+        let c = NODE.length;
+        NODE.forEach(n => {
+            _get(`/nodes/${n}/storage/${STORAGE}/content?content=vztmpl`, 'get').then(data => {
+              c--
+              resp[n] = data;
+              if(c == 0){
+                cb(resp);
+              }
+            });
         });
     }
 
     px.deleteContainer = (id, cb) => {
-        _get(`/nodes/${NODE}/lxc/${id}`, 'delete').then(data => {
-            cb(data);
+        let resp = {};
+        let c = NODE.length;
+        NODE.forEach(n => {
+            _get(`/nodes/${n}/lxc/${id}`, 'delete').then(data => {
+              c--
+              resp[n] = data;
+              if(c == 0){
+                cb(resp);
+              }
+            });
         });
     }
 
     px.statusContainer = (id, cb) => {
-        _get(`/nodes/${NODE}/lxc/${id}/status/current`, 'get').then(data => {
-            cb(data);
+        let resp = {};
+        let c = NODE.length;
+        NODE.forEach(n => {
+            _get(`/nodes/${n}/lxc/${id}/status/current`, 'get').then(data => {
+              c--
+              resp[n] = data;
+              if(c == 0){
+                cb(resp);
+              }
+            });
         });
     }
 

@@ -16,22 +16,12 @@ npm install proxmox-lib
 
 ## Use
 
-Require the library for each Node
-
 ```
   var px = require('proxmox-lib')({
     url: '<https://localhost:8006/api2/json/>',
     user: 'root',
     password: 'password',
-    node: 'pve1',
-    templateStorage: 'local'
-  });
-
-  var px1 = require('proxmox-lib')({
-    url: '<https://localhost:8006/api2/json/>',
-    user: 'root',
-    password: 'password',
-    node: 'pve2',
+    node: ['node1', 'node2'],
     templateStorage: 'local'
   });
 ```
