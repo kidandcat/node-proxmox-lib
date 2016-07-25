@@ -2,11 +2,11 @@
 
 ## Status
 
-- #### In progress
+- In progress
 
 ## Requirements
 
-- #### Proxmox VE Api Version 2 -> <https://pve.proxmox.com/wiki/Proxmox_VE_API>
+- Proxmox VE Api Version 2 -> <https://pve.proxmox.com/wiki/Proxmox_VE_API>
 
 ## Install
 
@@ -18,7 +18,7 @@ npm install proxmox-lib
 
 ```
   var px = require('proxmox-lib')({
-    url: '<https://localhost:8006/api2/json/>',
+    url: 'https://localhost:8006/api2/json/',
     user: 'root',
     password: 'password',
     node: ['node1', 'node2'],
