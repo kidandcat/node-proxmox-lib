@@ -7,6 +7,7 @@ module.exports = (options) => {
     options.password = options.password || '';
     options.node = options.node || ['pve'];
     options.templateStorage = options.templateStorage || 'local';
+    options.distributionProperty = options.distributionProperty || 'LOAD'; //LOAD, MEMORY, DISK
 
     if (options.url.slice(-1) == '/') {
         options.url = options.url.slice(0, -1);
@@ -18,6 +19,7 @@ module.exports = (options) => {
     const PASS = options.password;
     let NODE = Array.from(options.node);
     const STORAGE = options.templateStorage;
+    const DISTRIBUTION = options.distributionProperty;
     let TICKET = '';
     let CSRF = '';
 
@@ -43,8 +45,8 @@ module.exports = (options) => {
             _get(`/nodes/${n}/status`, 'get').then(data => {
                 c--
                 resp[n] = data;
-                if(c == 0){
-                  cb(resp);
+                if (c == 0) {
+                    cb(resp);
                 }
             });
         });
@@ -55,11 +57,11 @@ module.exports = (options) => {
         let c = NODE.length;
         NODE.forEach(n => {
             _get(`/nodes/${n}/storage/${STORAGE}/content?content=vztmpl`, 'get').then(data => {
-              c--
-              resp[n] = data;
-              if(c == 0){
-                cb(resp);
-              }
+                c--
+                resp[n] = data;
+                if (c == 0) {
+                    cb(resp);
+                }
             });
         });
     }
@@ -69,11 +71,11 @@ module.exports = (options) => {
         let c = NODE.length;
         NODE.forEach(n => {
             _get(`/nodes/${n}/lxc/${id}`, 'delete').then(data => {
-              c--
-              resp[n] = data;
-              if(c == 0){
-                cb(resp);
-              }
+                c--
+                resp[n] = data;
+                if (c == 0) {
+                    cb(resp);
+                }
             });
         });
     }
@@ -83,11 +85,11 @@ module.exports = (options) => {
         let c = NODE.length;
         NODE.forEach(n => {
             _get(`/nodes/${n}/lxc/${id}/status/current`, 'get').then(data => {
-              c--
-              resp[n] = data;
-              if(c == 0){
-                cb(resp);
-              }
+                c--
+                resp[n] = data;
+                if (c == 0) {
+                    cb(resp);
+                }
             });
         });
     }
@@ -97,11 +99,11 @@ module.exports = (options) => {
         let c = NODE.length;
         NODE.forEach(n => {
             _get(`/nodes/${n}/lxc/${id}/status/start`, 'post').then(data => {
-              c--
-              resp[n] = data;
-              if(c == 0){
-                cb(resp);
-              }
+                c--
+                resp[n] = data;
+                if (c == 0) {
+                    cb(resp);
+                }
             });
         });
     }
@@ -111,36 +113,77 @@ module.exports = (options) => {
         let c = NODE.length;
         NODE.forEach(n => {
             _get(`/nodes/${n}/lxc/${id}/status/stop`, 'post').then(data => {
-              c--
-              resp[n] = data;
-              if(c == 0){
-                cb(resp);
-              }
+                c--
+                resp[n] = data;
+                if (c == 0) {
+                    cb(resp);
+                }
             });
         });
     }
 
     px.createContainer = (options, cb) => {
-        px.nextId((response) => {
-            _get(`/nodes/${NODE[0]}/lxc`, 'post', {
-                ostemplate: options.template,
-                vmid: Number(response.data),
-                cpuunits: options.cpu,
-                hostname: options.name,
-                memory: options.memory,
-                rootfs: options.disk,
-                swap: options.swap,
-                ostype: options.ostype,
-                storage: options.storage,
-                password: options.password
-            }).then(data => {
-                cb(data);
+        _distribution(node => {
+            px.nextId((response) => {
+                _get(`/nodes/${node}/lxc`, 'post', {
+                    ostemplate: options.template,
+                    vmid: Number(response.data),
+                    cpuunits: options.cpu,
+                    hostname: options.name,
+                    memory: options.memory,
+                    rootfs: options.disk,
+                    swap: options.swap,
+                    ostype: options.ostype,
+                    storage: options.storage,
+                    password: options.password
+                }).then(data => {
+                    cb(data);
+                });
             });
         });
     }
 
 
 
+
+
+    function _distribution(cb) {
+        let lowest = '';
+        let lowestN = -1;
+        px.nodeStatus(status => {
+            switch (DISTRIBUTION) {
+                case "LOAD":
+                    NODE.forEach(n => {
+                        console.log('---------AVERAGE:' + status[n].data.loadavg[2], n);
+                        if (lowestN > status[n].data.loadavg[2] || lowestN == -1) {
+                            lowestN = status[n].data.loadavg[2];
+                            lowest = n;
+                        }
+                    });
+                    break;
+                case "MEMORY":
+                    NODE.forEach(n => {
+                        console.log('---------MEMORY:' + (status[n].data.memory.free / 1000 / 1000) + 'MB', n);
+                        if (lowestN < status[n].data.memory.free || lowestN == -1) {
+                            lowestN = status[n].data.memory.free;
+                            lowest = n;
+                        }
+                    });
+                    break;
+                case "DISK":
+                    NODE.forEach(n => {
+                        console.log('---------DISK:' + (status[n].data.rootfs.free / 1000 / 1000) + 'MB', n);
+                        if (lowestN < status[n].data.rootfs.free || lowestN == -1) {
+                            lowestN = status[n].data.rootfs.free;
+                            lowest = n;
+                        }
+                    });
+                    break;
+            }
+            console.log('---------SELECTED:', lowest);
+            cb(lowest);
+        });
+    }
 
 
     function _ticket(cb) {
@@ -157,8 +200,6 @@ module.exports = (options) => {
         //Promise
 
         const path = ur || '';
-        console.log(verb + ' ' + URL + path);
-        console.log('data:', data);
         request({
             method: verb,
             uri: URL + path,
@@ -174,7 +215,6 @@ module.exports = (options) => {
                 error(err);
             }
 
-            console.log(res.statusCode);
             if (res.statusCode == 401 && !retry) {
                 _ticket(() => {
                     _get(ur, verb, data, true).then(data => {
@@ -183,7 +223,6 @@ module.exports = (options) => {
                 });
             } else {
                 if (res.statusCode == 200) {
-                    console.log('SUCCESS:', body);
                     success(JSON.parse(body));
                 } else {
                     success(res.statusMessage + ' - ' + body);
@@ -220,7 +259,6 @@ module.exports = (options) => {
 
 
             if (res.statusCode == 200) {
-                console.log('SUCCESS:', body);
                 success(JSON.parse(body));
             } else {
                 throw new Error(`Auth failed! ${USER} - ${PASS}`, body);
