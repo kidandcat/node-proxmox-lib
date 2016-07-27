@@ -6,6 +6,7 @@ module.exports = (options) => {
     options.user = options.user || 'root';
     options.password = options.password || '';
     options.node = options.node || ['pve'];
+    options.net = options.net || `name=eth0,ip=dhcp,bridge=vmbr0`;
     options.templateStorage = options.templateStorage || 'local';
     options.distributionProperty = options.distributionProperty || 'LOAD'; //LOAD, MEMORY, DISK
 
@@ -20,6 +21,7 @@ module.exports = (options) => {
     let NODE = Array.from(options.node);
     const STORAGE = options.templateStorage;
     const DISTRIBUTION = options.distributionProperty;
+    const NET = options.net;
     let TICKET = '';
     let CSRF = '';
 
@@ -135,6 +137,7 @@ module.exports = (options) => {
                     swap: options.swap,
                     ostype: options.ostype,
                     storage: options.storage,
+                    net0: NET,
                     password: options.password
                 }).then(data => {
                     cb(data);
