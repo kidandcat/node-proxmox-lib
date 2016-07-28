@@ -18,11 +18,12 @@ npm install proxmox-lib
 
 ```
   var px = require('proxmox-lib')({
-    url: 'https://localhost:8006/api2/json/',
+    url: 'https://localhost:8006',
     user: 'root',
     password: 'password',
     node: ['node1', 'node2'],
-    templateStorage: 'local'
+    templateStorage: 'local',
+    vncserver: 'https://localhost:8006'
   });
 ```
 
@@ -39,6 +40,8 @@ npm install proxmox-lib
 - px.deleteContainer(id, callback) -> Delete the container
 
 - px.statusContainer(id, callback) -> Status of container
+
+- px.vncContainer(id, callback) -> Url for vnc terminal
 
 - px.startContainer(id, callback) -> Start container
 

@@ -2,7 +2,8 @@ module.exports = (options) => {
 
     let px = {};
 
-    options.url = options.url || 'https://localhost:8006/api2/json/';
+    options.url = options.url || 'https://localhost:8006';
+    options.vncserver = options.vncserver || 'https://localhost:8006';
     options.user = options.user || 'root';
     options.password = options.password || '';
     options.node = options.node || ['pve'];
@@ -15,7 +16,8 @@ module.exports = (options) => {
     }
 
     const request = require('request');
-    const URL = options.url;
+    const URL = options.url + '/api2/json';
+    const HOST = options.vncserver;
     const USER = options.user;
     const PASS = options.password;
     let NODE = Array.from(options.node);
@@ -48,6 +50,28 @@ module.exports = (options) => {
                 c--
                 resp[n] = data;
                 if (c == 0) {
+                    cb(resp);
+                }
+            });
+        });
+    }
+
+    px.vncContainer = (id, cb) => {
+        let resp = {};
+        let c = NODE.length;
+        let done = false;
+
+        NODE.forEach(n => {
+            _get(`/nodes/${n}/lxc/${id}/status/current`, 'get').then(data => {
+                c--
+                resp[n] = data;
+                if(data.data){
+                  done = true;
+                  cb({
+                    url: `${HOST}/?console=lxc&novnc=1&vmid=${id}&node=${n}`
+                  });
+                }
+                if (c == 0 && !done) {
                     cb(resp);
                 }
             });
@@ -264,7 +288,7 @@ module.exports = (options) => {
             if (res.statusCode == 200) {
                 success(JSON.parse(body));
             } else {
-                throw new Error(`Auth failed! ${USER} - ${PASS}`, body);
+                throw new Error(`Auth failed! ${URL} - ${USER} - ${PASS}`, body);
             }
         });
 
