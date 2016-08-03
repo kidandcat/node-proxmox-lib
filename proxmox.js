@@ -229,7 +229,7 @@ module.exports = (options) => {
     px.ticket = (cb) => {
       _getTicket('/access/ticket').then((d) => {
           cb({
-            ticket: "PVEAuthCookie=" + d.data.ticket,
+            ticket: d.data.ticket,
             CSRF: d.data.CSRFPreventionToken
           });
       });
