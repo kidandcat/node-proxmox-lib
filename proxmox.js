@@ -120,6 +120,20 @@ module.exports = (options) => {
         });
     }
 
+    px.dataContainer = (id, cb) => {
+        let resp = {};
+        let c = NODE.length;
+        NODE.forEach(n => {
+            _get(`/nodes/${n}/lxc/${id}/rrddata?timeframe=hour`, 'get').then(data => {
+                c--
+                resp[n] = data;
+                if (c == 0) {
+                    cb(resp);
+                }
+            });
+        });
+    }
+
     px.startContainer = (id, cb) => {
         let resp = {};
         let c = NODE.length;
@@ -212,6 +226,14 @@ module.exports = (options) => {
         });
     }
 
+    px.ticket = (cb) => {
+      _getTicket('/access/ticket').then((d) => {
+          cb({
+            ticket: "PVEAuthCookie=" + d.data.ticket,
+            CSRF: d.data.CSRFPreventionToken
+          });
+      });
+    }
 
     function _ticket(cb) {
         _getTicket('/access/ticket').then((d) => {
