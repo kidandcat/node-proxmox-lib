@@ -185,7 +185,7 @@ module.exports = (options) => {
                     swap: options.swap,
                     ostype: options.ostype,
                     storage: options.storage,
-                    net0: NET,
+                    net0: options.net || NET,
                     password: options.password
                 }).then(data => {
                     cb(data);
