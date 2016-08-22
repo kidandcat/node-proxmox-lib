@@ -130,6 +130,20 @@ module.exports = (options) => {
         });
     }
 
+    px.networkContainer = (id, cb) => {
+        let resp = {};
+        let c = NODE.length;
+        NODE.forEach(n => {
+            _get(`/nodes/${n}/lxc/${id}/config`, 'get').then(data => {
+                c--
+                resp[n] = data;
+                if (c == 0) {
+                    cb(resp);
+                }
+            });
+        });
+    }
+
     px.dataContainer = (id, cb) => {
         let resp = {};
         let c = NODE.length;
