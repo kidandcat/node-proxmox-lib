@@ -193,7 +193,7 @@ module.exports = (options) => {
                     ostemplate: options.template,
                     vmid: Number(response.data),
                     cpuunits: options.cpu,
-                    hostname: options.name,
+                    description: options.description,
                     memory: options.memory,
                     rootfs: options.disk,
                     swap: options.swap,
