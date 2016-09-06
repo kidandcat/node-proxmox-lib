@@ -208,6 +208,34 @@ module.exports = (options) => {
         });
     }
 
+    px.modifyContainer = (id, options, cb) => {
+        _distribution(node => {
+            px.nextId((response) => {
+                let params = {};
+                if (options.cpu)
+                    params.cpuunits = options.cpu;
+                if (options.description)
+                    params.description = options.description;
+                if (options.memory)
+                    params.memory = options.memory;
+                if (options.disk)
+                    params.rootfs = options.disk;
+                if (options.swap)
+                    params.swap = options.swap;
+                if (options.ostype)
+                    params.ostype = options.ostype;
+                if (options.net)
+                    params.net = options.net;
+                if (options.password)
+                    params.password = options.password;
+                _get(`/nodes/${node}/lxc/${id}/config`, 'put', params).then(data => {
+                    if (typeof cb == 'function')
+                        cb(data);
+                });
+            });
+        });
+    }
+
 
 
 
