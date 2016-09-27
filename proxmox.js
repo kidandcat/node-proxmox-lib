@@ -56,6 +56,20 @@ module.exports = (options) => {
         });
     }
 
+    px.nodeStorage = (cb) => {
+        let resp = {};
+        let c = NODE.length;
+        NODE.forEach(n => {
+            _get(`/nodes/${n}/storage`, 'get').then(data => {
+                c--
+                resp[n] = data;
+                if (c == 0) {
+                    cb(resp);
+                }
+            });
+        });
+    }
+
     px.vncContainer = (id, cb) => {
         let resp = {};
         let c = NODE.length;
